@@ -1,6 +1,6 @@
 # Build a test binary
 
-*You will need *gccgo* and *make* to build a test binary.*
+*You will need 'gccgo' and 'make' to build a test binary.*
 
 To build a test binary (= *test code* + *data structure* to test), in **src/**, run:
 
