@@ -23,7 +23,6 @@
  * A Lazy Concurrent List-Based Set Algorithm,
  * S. Heller, M. Herlihy, V. Luchangco, M. Moir, W.N. Scherer III, N. Shavit
  * p.3-16, OPODIS 2005
- * lazy.c is part of ASCYLIB
 **/
 
 package dataset
@@ -82,7 +81,7 @@ func New() *DataSet {
     set := new(DataSet)
     max := new_node(share.KEY_MAX, 0, nil)
     min := new_node(share.KEY_MIN, 0, max)
-    atomic.StorePointer((*unsafe.Pointer)(unsafe.Pointer(&set.head)), unsafe.Pointer(min)) // So painful...
+    set.head = min
     return set
 }
 
