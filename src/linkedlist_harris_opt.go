@@ -110,7 +110,7 @@ func (set *DataSet) Size() uint {
         }
         node = get_unmarked_ref(node.next)
     }
-    return size;
+    return size
 }
 
 func (set *DataSet) Has(res share.Key) bool {
@@ -118,17 +118,15 @@ func (set *DataSet) Has(res share.Key) bool {
     return ok
 }
 
-func (set *DataSet) Find(key share.Key) (res share.Val, ok bool) {
+func (set *DataSet) Find(key share.Key) (share.Val, bool) {
     node := set.head.next
     for node.key < key {
         node = get_unmarked_ref(node.next)
     }
     if node.key == key && !is_marked_ref(node.next) {
-        res, ok = node.val, true
-        return
+        return node.val, true
     }
-    res, ok = 0, false
-    return
+    return 0, false
 }
 
 func (set *DataSet) Insert(key share.Key, val share.Val) bool {
@@ -150,8 +148,7 @@ func (set *DataSet) Delete(key share.Key) (result share.Val, ok bool) {
     for {
         left_node, right_node = list_search(set, key)
         if right_node.key != key {
-            result, ok = 0, false
-            return
+            return 0, false
         }
         unmarked_ref := get_unmarked_ref(right_node.next) // Try to mark right_node as logically deleted
         marked_ref := get_marked_ref(unmarked_ref)

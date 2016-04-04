@@ -102,17 +102,15 @@ func (set *DataSet) Has(res share.Key) bool {
     return ok
 }
 
-func (set *DataSet) Find(key share.Key) (res share.Val, ok bool) {
+func (set *DataSet) Find(key share.Key) (share.Val, bool) {
     curr := set.head
     for curr.key < key {
         curr = curr.next
     }
     if curr.key == key && !curr.marked {
-        res, ok = curr.val, true
-        return
+        return curr.val, true
     }
-    res, ok = 0, false
-    return
+    return 0, false
 }
 
 func (set *DataSet) Insert(key share.Key, val share.Val) bool {
@@ -158,7 +156,7 @@ func (set *DataSet) Delete(key share.Key) (result share.Val, ok bool) {
     var pred *node
     var curr *node
     var done bool = false
-    for {
+    for !done {
         pred = set.head
         curr = pred.next
         for curr.key < key {
@@ -184,9 +182,6 @@ func (set *DataSet) Delete(key share.Key) (result share.Val, ok bool) {
             }
             curr.unlock()
             pred.unlock()
-        }
-        if (done) {
-            break
         }
     }
     return
