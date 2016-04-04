@@ -30,7 +30,7 @@ import (
     "math/rand"
     "sync"
     "sync/atomic"
-    "test/prototype"
+    "tools/share"
     "time"
     "tools/assert"
     "tools/thread"
@@ -134,7 +134,7 @@ func main() {
     { // DataSet initialization (kept while not found in test_simple.c)
         fmt.Printf("Adding %v entries to set...", initial)
         for i := initial; i > 0; i-- {
-            set.Insert(prototype.Key(i), 0)
+            set.Insert(share.Key(i), 0)
         }
         size = set.Size()
         fmt.Printf(" done.\n")
@@ -145,7 +145,7 @@ func main() {
     test := func(id uint, stats *stats_t) {
         for running != 0 { /// FIXME: Check behavior
             op := uint(rand.Intn(100))
-            key := prototype.Key(rand.Intn(int(rng)) + 1)
+            key := share.Key(rand.Intn(int(rng)) + 1)
             if (op < put) {
                 if set.Insert(key, 0) {
                     stats.putting_count_succ++

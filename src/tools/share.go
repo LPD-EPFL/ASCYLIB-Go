@@ -1,5 +1,5 @@
 /**
- * @file   prototype.go
+ * @file   share.go
  * @author Sébastien Rouault <sebastien.rouault@epfl.ch>
  *
  * @section LICENSE
@@ -20,10 +20,10 @@
  *
  * @section DESCRIPTION
  *
- * Common types.
+ * Shared pieces of code between test module and data structures.
 **/
 
-package prototype
+package share
 
 import (
     "math"

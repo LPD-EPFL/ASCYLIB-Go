@@ -27,7 +27,7 @@ package dataset
 
 import (
     "fmt"
-    "test/prototype"
+    "tools/share"
 )
 
 // -----------------------------------------------------------------------------
@@ -46,21 +46,21 @@ func (set *DataSet) Size() uint {
     return 0
 }
 
-func (set *DataSet) Has(res prototype.Key) bool {
+func (set *DataSet) Has(res share.Key) bool {
     _, ok := set.Find(res)
     return ok
 }
 
-func (set *DataSet) Find(key prototype.Key) (res prototype.Val, ok bool) {
+func (set *DataSet) Find(key share.Key) (res share.Val, ok bool) {
     res, ok = 0, false
     return
 }
 
-func (set *DataSet) Insert(key prototype.Key, val prototype.Val) bool {
+func (set *DataSet) Insert(key share.Key, val share.Val) bool {
     return false
 }
 
-func (set *DataSet) Delete(key prototype.Key) (result prototype.Val, ok bool) {
+func (set *DataSet) Delete(key share.Key) (result share.Val, ok bool) {
     result, ok = 0, false
     return
 }

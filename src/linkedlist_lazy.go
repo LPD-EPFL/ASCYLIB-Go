@@ -31,7 +31,7 @@ package dataset
 import (
     "sync"
     "sync/atomic"
-    "test/prototype"
+    "tools/share"
     "unsafe"
 )
 
@@ -42,8 +42,8 @@ const (
 // -----------------------------------------------------------------------------
 
 type node struct {
-    key prototype.Key
-    val prototype.Val
+    key share.Key
+    val share.Val
     next *node
     marked bool
     mutex sync.Mutex
@@ -63,7 +63,7 @@ func (n *node) unlock() {
     n.mutex.Unlock()
 }
 
-func new_node(key prototype.Key, val prototype.Val, next *node) *node {
+func new_node(key share.Key, val share.Val, next *node) *node {
     node := new(node) // No allocation failure test to do, and we cannot recover from an "OOM panic" (see http://stackoverflow.com/questions/30577308/golang-cannot-recover-from-out-of-memory-crash)
     node.key = key
     node.val = val
@@ -80,8 +80,8 @@ func validate(pred *node, curr *node) bool {
 
 func New() *DataSet {
     set := new(DataSet)
-    max := new_node(prototype.KEY_MAX, 0, nil)
-    min := new_node(prototype.KEY_MIN, 0, max)
+    max := new_node(share.KEY_MAX, 0, nil)
+    min := new_node(share.KEY_MIN, 0, max)
     atomic.StorePointer((*unsafe.Pointer)(unsafe.Pointer(&set.head)), unsafe.Pointer(min)) // So painful...
     return set
 }
@@ -98,12 +98,12 @@ func (set *DataSet) Size() uint {
     return size
 }
 
-func (set *DataSet) Has(res prototype.Key) bool {
+func (set *DataSet) Has(res share.Key) bool {
     _, ok := set.Find(res)
     return ok
 }
 
-func (set *DataSet) Find(key prototype.Key) (res prototype.Val, ok bool) {
+func (set *DataSet) Find(key share.Key) (res share.Val, ok bool) {
     curr := set.head
     for curr.key < key {
         curr = curr.next
@@ -116,7 +116,7 @@ func (set *DataSet) Find(key prototype.Key) (res prototype.Val, ok bool) {
     return
 }
 
-func (set *DataSet) Insert(key prototype.Key, val prototype.Val) bool {
+func (set *DataSet) Insert(key share.Key, val share.Val) bool {
     var curr *node
     var pred *node
     var newnode *node
@@ -155,7 +155,7 @@ func (set *DataSet) Insert(key prototype.Key, val prototype.Val) bool {
     }
 }
 
-func (set *DataSet) Delete(key prototype.Key) (result prototype.Val, ok bool) {
+func (set *DataSet) Delete(key share.Key) (result share.Val, ok bool) {
     var pred *node
     var curr *node
     var done bool = false
