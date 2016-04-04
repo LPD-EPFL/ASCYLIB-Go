@@ -1,0 +1,194 @@
+/**
+ * @file   linkedlist_lazy.go
+ * @author Sébastien Rouault <sebastien.rouault@epfl.ch>
+ *
+ * @section LICENSE
+ *
+ * Copyright (c) 2014 Vasileios Trigonakis <vasileios.trigonakis@epfl.ch>,
+ *                    Tudor David <tudor.david@epfl.ch>
+ *                    Distributed Programming Lab (LPD), EPFL
+ *
+ * ASCYLIB is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, version 2
+ * of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * @section DESCRIPTION
+ *
+ * A Lazy Concurrent List-Based Set Algorithm,
+ * S. Heller, M. Herlihy, V. Luchangco, M. Moir, W.N. Scherer III, N. Shavit
+ * p.3-16, OPODIS 2005
+ * lazy.c is part of ASCYLIB
+**/
+
+package dataset
+
+import (
+    "sync"
+    "sync/atomic"
+    "test/prototype"
+    "unsafe"
+)
+
+const (
+    lazy_ro_fail = true
+)
+
+// -----------------------------------------------------------------------------
+
+type node struct {
+    key prototype.Key
+    val prototype.Val
+    next *node
+    marked bool
+    mutex sync.Mutex
+}
+
+type DataSet struct {
+    head *node
+}
+
+// -----------------------------------------------------------------------------
+
+func (n *node) lock() {
+    n.mutex.Lock()
+}
+
+func (n *node) unlock() {
+    n.mutex.Unlock()
+}
+
+func new_node(key prototype.Key, val prototype.Val, next *node) *node {
+    node := new(node) // No allocation failure test to do, and we cannot recover from an "OOM panic" (see http://stackoverflow.com/questions/30577308/golang-cannot-recover-from-out-of-memory-crash)
+    node.key = key
+    node.val = val
+    node.next = next
+    node.marked = false
+    return node
+}
+
+func validate(pred *node, curr *node) bool {
+    return !pred.marked && !curr.marked && pred.next == curr
+}
+
+// -----------------------------------------------------------------------------
+
+func New() *DataSet {
+    set := new(DataSet)
+    max := new_node(prototype.KEY_MAX, 0, nil)
+    min := new_node(prototype.KEY_MIN, 0, max)
+    atomic.StorePointer((*unsafe.Pointer)(unsafe.Pointer(&set.head)), unsafe.Pointer(min)) // So painful...
+    return set
+}
+
+func (set *DataSet) Size() uint {
+    var size uint
+    var node *node
+    /* We have at least 2 elements */
+    node = set.head.next
+    for node.next != nil {
+        size++
+        node = node.next
+    }
+    return size
+}
+
+func (set *DataSet) Has(res prototype.Key) bool {
+    _, ok := set.Find(res)
+    return ok
+}
+
+func (set *DataSet) Find(key prototype.Key) (res prototype.Val, ok bool) {
+    curr := set.head
+    for curr.key < key {
+        curr = curr.next
+    }
+    if curr.key == key && !curr.marked {
+        res, ok = curr.val, true
+        return
+    }
+    res, ok = 0, false
+    return
+}
+
+func (set *DataSet) Insert(key prototype.Key, val prototype.Val) bool {
+    var curr *node
+    var pred *node
+    var newnode *node
+    for {
+        // PARSE_TRY()
+        pred = set.head
+        curr = pred.next
+        for curr.key < key {
+            pred = curr
+            curr = curr.next
+        }
+        // UPDATE_TRY()
+        if lazy_ro_fail {
+            if curr.key == key {
+                if curr.marked {
+                    continue
+                }
+                return false
+            }
+        }
+        {
+            pred.lock()
+            if validate(pred, curr) {
+                if curr.key == key {
+                    pred.unlock()
+                    return false
+                } else {
+                    newnode = new_node(key, val, curr)
+                    atomic.StorePointer((*unsafe.Pointer)(unsafe.Pointer(&pred.next)), unsafe.Pointer(newnode))
+                    pred.unlock()
+                    return true
+                }
+            }
+            pred.unlock()
+        }
+    }
+}
+
+func (set *DataSet) Delete(key prototype.Key) (result prototype.Val, ok bool) {
+    var pred *node
+    var curr *node
+    var done bool = false
+    for {
+        pred = set.head
+        curr = pred.next
+        for curr.key < key {
+            pred = curr
+            curr = curr.next
+        }
+        if lazy_ro_fail {
+            if curr.key != key {
+                return
+            }
+        }
+        {
+            pred.lock()
+            curr.lock()
+            if validate(pred, curr) {
+                if key == curr.key {
+                    result, ok = curr.val, true
+                    var c_nxt *node = curr.next
+                    curr.marked = true
+                    pred.next = c_nxt
+                }
+                done = true
+            }
+            curr.unlock()
+            pred.unlock()
+        }
+        if (done) {
+            break
+        }
+    }
+    return
+}
