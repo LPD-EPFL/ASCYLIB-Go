@@ -34,6 +34,7 @@ import (
     "time"
     "tools/assert"
     "tools/thread"
+    "tools/volatile"
     "unsafe"
 )
 
@@ -143,7 +144,7 @@ func main() {
 
     var barrier sync.WaitGroup
     test := func(id uint, stats *stats_t) {
-        for running != 0 { /// FIXME: Check behavior
+        for volatile.ReadInt32(&running) != 0 {
             op := uint(rand.Intn(100))
             key := share.Key(rand.Intn(int(rng)) + 1)
             if (op < put) {

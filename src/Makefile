@@ -4,7 +4,7 @@ TEST = simple
 OBJ  = .
 BIN  = ../bin/$(NAME)_$(TEST)
 
-SOURCES = $(wildcard tools/*.go) dataset.go test/$(TEST).go
+SOURCES = tools/volatile.go tools/assert.go tools/optik.go tools/thread.go tools/share.go dataset.go test/$(TEST).go
 OBJECTS = $(SOURCES:%.go=$(OBJ)/%.o)
 
 CC     = gccgo
