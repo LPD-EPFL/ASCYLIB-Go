@@ -39,3 +39,7 @@ const (
     KEY_MIN = math.MinInt64
     KEY_MAX = math.MaxInt64
 )
+
+// Global variables
+var Capacity uint
+var Concurrency uint

@@ -81,6 +81,7 @@ func main() {
     var rng uint
     var update uint
     var put uint
+    var load_factor uint
 
     var update_rate, put_rate, get_rate float64
 
@@ -91,6 +92,8 @@ func main() {
         flag.UintVar(&rng, "r", 2048, "Range of integer values inserted in set")
         flag.UintVar(&update, "u", 20, "Percentage of update transactions")
         flag.UintVar(&put, "p", 10, "Percentage of put update transactions (should be less than percentage of updates)")
+        flag.UintVar(&load_factor, "c", 1, "Load factor for the hash table")
+        flag.UintVar(&share.Concurrency, "l", 512, "Concurrency level for the hash table")
         flag.Parse()
 
         if put > update {
@@ -105,6 +108,12 @@ func main() {
             temp := toPow2(initial)
             fmt.Printf("** rounding up initial (to make it power of 2): old: %v / new: %v\n", initial, temp)
             initial = temp
+        }
+        share.Capacity = initial / load_factor
+        if !isPow2(share.Concurrency) {
+            temp := toPow2(share.Concurrency)
+            fmt.Printf("** rounding up concurrency (to make it power of 2): old: %v / new: %v\n", share.Concurrency, temp)
+            share.Concurrency = temp
         }
         if rng < initial {
             rng = 2 * initial

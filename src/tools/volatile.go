@@ -24,6 +24,10 @@
 
 package volatile
 
+import (
+    "unsafe"
+)
+
 // -----------------------------------------------------------------------------
 
 /** Read an integer.
@@ -52,5 +56,13 @@ func ReadUint32(p *uint32) uint32 {
     return *p
 }
 func ReadUint64(p *uint64) uint64 {
+    return *p
+}
+
+/** Read a pointer.
+ * @param p Pointer on the pointer
+ * @return Value of the pointer
+**/
+func ReadPointer(p *unsafe.Pointer) unsafe.Pointer {
     return *p
 }
