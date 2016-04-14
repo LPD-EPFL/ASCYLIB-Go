@@ -76,11 +76,6 @@ func (set *DataSet) Size() uint {
     return size
 }
 
-func (set *DataSet) Has(res share.Key) bool {
-    _, ok := set.Find(res)
-    return ok
-}
-
 func (set *DataSet) Find(key share.Key) (res share.Val, ok bool) {
     curr := set.head
     for curr.key < key {

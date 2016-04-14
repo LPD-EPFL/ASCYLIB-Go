@@ -159,7 +159,8 @@ func main() {
                 }
                 stats.removing_count++
             } else {
-                if set.Has(key) {
+                _, ok := set.Find(key)
+                if ok {
                     stats.getting_count_succ++
                 }
                 stats.getting_count++

@@ -136,11 +136,6 @@ func (set *DataSet) Size() uint {
     return size
 }
 
-func (set *DataSet) Has(res share.Key) bool {
-    _, ok := set.Find(res)
-    return ok
-}
-
 func (set *DataSet) Find(key share.Key) (share.Val, bool) {
     right := set.search_weak_right(key)
     if right.key == key {
