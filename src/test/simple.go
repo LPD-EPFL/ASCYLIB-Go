@@ -94,6 +94,7 @@ func main() {
         flag.UintVar(&put, "p", 10, "Percentage of put update transactions (should be less than percentage of updates)")
         flag.UintVar(&load_factor, "c", 1, "Load factor for the hash table")
         flag.UintVar(&share.Concurrency, "l", 512, "Concurrency level for the hash table")
+        flag.UintVar(&share.NumBuckets, "b", 64, "Amount of buckets for the hash table")
         flag.Parse()
 
         if put > update {

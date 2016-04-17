@@ -43,3 +43,4 @@ const (
 // Global variables
 var Capacity uint
 var Concurrency uint
+var NumBuckets uint
