@@ -76,7 +76,7 @@ func (set *DataSet) Size() uint {
     return size
 }
 
-func (set *DataSet) Find(key share.Key) (res share.Val, ok bool) {
+func (set *DataSet) Find(key share.Key) (share.Val, bool) {
     curr := set.head
     for curr.key < key {
         curr = curr.next
@@ -89,12 +89,11 @@ func (set *DataSet) Find(key share.Key) (res share.Val, ok bool) {
 
 func (set *DataSet) Insert(key share.Key, val share.Val) bool {
     var pred_ver optik.Mutex
-    pred_ver.Init()
     for {
-        curr := set.head
         var pred *node
+        curr := set.head
         for {
-            curr_ver := curr.mutex
+            curr_ver := curr.mutex.Load()
             pred = curr
             pred_ver = curr_ver
             curr = curr.next
@@ -115,20 +114,17 @@ func (set *DataSet) Insert(key share.Key, val share.Val) bool {
     }
 }
 
-func (set *DataSet) Delete(key share.Key) (result share.Val, ok bool) {
-    var pred_ver optik.Mutex
-    var curr_ver optik.Mutex
-    pred_ver.Init()
-    curr_ver.Init()
+func (set *DataSet) Delete(key share.Key) (share.Val, bool) {
     for {
-        curr := set.head
         var pred *node
+        var pred_ver optik.Mutex
+        curr := set.head
         curr_ver := curr.mutex
         for {
             pred = curr
             pred_ver = curr_ver
             curr = curr.next;
-            curr_ver = curr.mutex;
+            curr_ver = curr.mutex.Load()
             if !(curr.key < key) {
                 break
             }

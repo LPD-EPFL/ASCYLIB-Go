@@ -65,6 +65,10 @@ func (ol *Mutex) cas(old Mutex, new Mutex) bool {
 
 // -----------------------------------------------------------------------------
 
+func (ol *Mutex) Load() Mutex {
+    return (Mutex)(atomic.LoadUint64((*uint64)(ol)))
+}
+
 func Is_locked(mutex Mutex) bool {
     return mutex & 1 == 1
 }
