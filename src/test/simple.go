@@ -27,7 +27,6 @@ import (
     "dataset"
     "flag"
     "fmt"
-    "math/rand"
     "sync"
     "sync/atomic"
     "tools/share"
@@ -35,6 +34,7 @@ import (
     "tools/assert"
     "tools/thread"
     "tools/volatile"
+    "tools/xorshift"
     "unsafe"
 )
 
@@ -73,8 +73,6 @@ func toPow2(x uint) uint {
 // -----------------------------------------------------------------------------
 
 func main() {
-    rand.Seed(time.Now().UnixNano())
-
     var duration uint
     var initial uint
     var num_threads uint
@@ -154,9 +152,11 @@ func main() {
 
     var barrier sync.WaitGroup
     test := func(id uint, stats *stats_t) {
+        var xorshf xorshift.State
+        xorshf.Init()
         for volatile.ReadInt32(&running) != 0 {
-            op := uint(rand.Intn(100))
-            key := share.Key(rand.Intn(int(rng)) + 1)
+            op := uint(xorshf.Intn(100))
+            key := share.Key(xorshf.Intn(uint32(rng)) + 1)
             if (op < put) {
                 if set.Insert(key, 0) {
                     stats.putting_count_succ++
