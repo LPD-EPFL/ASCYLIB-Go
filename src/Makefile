@@ -11,7 +11,7 @@ CC     = gccgo
 CFLAGS = -Wall -g -O2 -I$(OBJ)
 LFLAGS = -static-libgo
 
-.PHONY: build run clean
+.PHONY: build build-all run clean
 
 $(OBJ)/dataset.o: $(NAME).go
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -21,6 +21,8 @@ $(BIN): $(OBJECTS)
 	$(CC) $(LFLAGS) -o $@ $^
 
 build: $(BIN)
+build-all:
+	@$(foreach name,$(patsubst %.go,%,$(subst base.go,,$(wildcard *.go))),touch $(name).go; $(MAKE) build NAME=$(name) TEST=$(TEST);)
 run:
 	@$(BIN)
 clean:
