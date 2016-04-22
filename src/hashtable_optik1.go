@@ -80,6 +80,9 @@ func New() *DataSet {
     return set
 }
 
+func (set *DataSet) Destroy() {
+}
+
 func (set *DataSet) Size() uint {
     var size uint = 0
     for i := uint(0); i < maxhtlength; i++ {

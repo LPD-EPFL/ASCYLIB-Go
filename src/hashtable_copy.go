@@ -86,6 +86,9 @@ func New() *DataSet {
     return set
 }
 
+func (set *DataSet) Destroy() {
+}
+
 func (set *DataSet) Size() uint {
     var s uint = 0
     for i := uint(0); i < set.num_buckets; i++ {

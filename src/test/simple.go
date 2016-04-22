@@ -249,4 +249,6 @@ func main() {
         fmt.Printf("#txs %v\t(%-10.0f)\n", num_threads, throughput)
         fmt.Printf("#Mops %.3f\n", throughput / 1e6)
     }
+
+    set.Destroy()
 }

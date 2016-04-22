@@ -42,6 +42,9 @@ func New() *DataSet {
     return new(DataSet)
 }
 
+func (set *DataSet) Destroy() {
+}
+
 func (set *DataSet) Size() uint {
     return 0
 }

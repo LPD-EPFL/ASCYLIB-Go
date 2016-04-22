@@ -200,6 +200,9 @@ func New() *DataSet {
     return set
 }
 
+func (set *DataSet) Destroy() {
+}
+
 func (set *DataSet) Size() uint {
     var size uint = 0
     for s := uint(0); s < set.num_segments; s++ {
