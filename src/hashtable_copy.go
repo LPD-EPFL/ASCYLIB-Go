@@ -151,12 +151,13 @@ func (set *DataSet) Delete(key share.Key) (result share.Val, ok bool) {
     set.lock[bucket].Lock()
     defer set.lock[bucket].Unlock()
     all_old = set.arrays[bucket]
-    all_new := new_array(all_old.size - 1)
+    all_new := new_array(all_old.size)
 
     var i, n uint = 0, 0
     for ; i < all_old.size; i++ {
         if all_old.table[i].key == key {
             result = all_old.table[i].val
+            all_new.size--
             ok = true
         } else {
             all_new.table[n].key = all_old.table[i].key
