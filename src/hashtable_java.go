@@ -28,6 +28,7 @@
 package dataset
 
 import (
+    "runtime"
     "sync/atomic"
     "tools/share"
     "tools/volatile"
@@ -60,7 +61,7 @@ func (m *mutex) lock() {
         if atomic.CompareAndSwapUint32(&m.state, 0, 1) {
             break
         }
-        // pause()
+        runtime.Gosched()
     }
 }
 
@@ -248,6 +249,7 @@ func (set *DataSet) Insert(key share.Key, val share.Val) bool {
         if seg_lock.tryLock() {
             break
         }
+        runtime.Gosched()
     }
 
     bucket := &seg.table[hash(key, set.hash_seed) & seg.hash]
@@ -295,6 +297,7 @@ func (set *DataSet) Delete(key share.Key) (result share.Val, ok bool) {
         if seg_lock.tryLock() {
             break
         }
+        runtime.Gosched()
     }
 
     bucket := &seg.table[hash(key, set.hash_seed) & seg.hash]
