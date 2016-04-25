@@ -9,6 +9,7 @@ OBJECTS = $(SOURCES:%.go=$(OBJ)/%.o)
 
 CC     = gccgo
 CFLAGS = -Wall -g -O2 -I$(OBJ)
+LD     = gccgo
 LFLAGS = -static-libgo
 
 .PHONY: build build-all run clean
@@ -18,7 +19,7 @@ $(OBJ)/dataset.o: $(NAME).go
 $(OBJ)/%.o: %.go
 	$(CC) $(CFLAGS) -c -o $@ $<
 $(BIN): $(OBJECTS)
-	$(CC) $(LFLAGS) -o $@ $^
+	$(LD) $(LFLAGS) -o $@ $^
 
 build: $(BIN)
 build-all:
