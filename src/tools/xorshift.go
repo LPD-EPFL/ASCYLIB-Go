@@ -53,5 +53,5 @@ func (state *State) Intn(n uint32) uint32 {
     state.x = state.y
     state.y = state.z
     state.z = t ^ state.x ^ state.y
-    return state.z  % n
+    return state.z % n
 }
