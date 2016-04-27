@@ -70,6 +70,15 @@ func toPow2(x uint) uint {
     }
 }
 
+func log2(x uint) uint {
+    var y uint = 0
+    for x > 1 {
+        x >>= 1
+        y++
+    }
+    return y
+}
+
 // -----------------------------------------------------------------------------
 
 func main() {
@@ -109,6 +118,7 @@ func main() {
             initial = temp
         }
         share.Capacity = initial / load_factor
+        share.LevelMax = log2(initial)
         if !isPow2(share.Concurrency) {
             temp := toPow2(share.Concurrency)
             fmt.Printf("** rounding up concurrency (to make it power of 2): old: %v / new: %v\n", share.Concurrency, temp)

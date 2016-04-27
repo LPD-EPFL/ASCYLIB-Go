@@ -44,3 +44,4 @@ const (
 var Capacity uint
 var Concurrency uint
 var NumBuckets uint
+var LevelMax uint
