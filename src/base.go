@@ -49,16 +49,14 @@ func (set *DataSet) Size() uint {
     return 0
 }
 
-func (set *DataSet) Find(key share.Key) (res share.Val, ok bool) {
-    res, ok = 0, false
-    return
+func (set *DataSet) Find(key share.Key) (share.Val, bool) {
+    return 0, false
 }
 
 func (set *DataSet) Insert(key share.Key, val share.Val) bool {
     return false
 }
 
-func (set *DataSet) Delete(key share.Key) (result share.Val, ok bool) {
-    result, ok = 0, false
-    return
+func (set *DataSet) Delete(key share.Key) (share.Val, bool) {
+    return 0, false
 }
