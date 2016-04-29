@@ -59,6 +59,14 @@ func ReadUint64(p *uint64) uint64 {
     return *p
 }
 
+/** Read a boolean.
+ * @param p Pointer on the boolean
+ * @return Value of the boolean
+**/
+func ReadBool(p *bool) bool {
+    return *p
+}
+
 /** Read a pointer.
  * @param p Pointer on the pointer
  * @return Value of the pointer
