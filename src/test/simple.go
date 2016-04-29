@@ -27,6 +27,7 @@ import (
     "dataset"
     "flag"
     "fmt"
+    "strconv"
     "sync"
     "sync/atomic"
     "tools/share"
@@ -240,7 +241,11 @@ func main() {
     }
 
     { // Print global statistics
-        assert.Assert(initial + uint(int64(putting_count_total_succ) - int64(removing_count_total_succ)) == set.Size(), "WRONG set size")
+        { // Assert set size
+            ssize := set.Size()
+            wsize := uint(int64(initial) + int64(putting_count_total_succ) - int64(removing_count_total_succ))
+            assert.Assert(wsize == ssize, "WRONG set size: " + strconv.Itoa(int(ssize)) + " instead of " + strconv.Itoa(int(wsize)))
+        }
 
         total := putting_count_total + getting_count_total + removing_count_total
         putting_perc := 100.0 * (1 - (float64(total - putting_count_total) / float64(total)))
