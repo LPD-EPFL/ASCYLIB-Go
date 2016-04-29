@@ -101,10 +101,10 @@ func get_lock(pred *node, key share.Key, lvl uint32) *node {
     pred.lock.Lock()
     succ = pred.next[lvl]
     for succ.key < key {
-      pred.lock.Unlock()
-      pred = succ
-      pred.lock.Lock()
-      succ = pred.next[lvl]
+        pred.lock.Unlock()
+        pred = succ
+        pred.lock.Lock()
+        succ = pred.next[lvl]
     }
 
     return pred
