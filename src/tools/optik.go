@@ -25,18 +25,13 @@ package optik
 
 import (
     "math"
+    "runtime"
     "sync/atomic"
-    "time"
     "tools/volatile"
 )
 
 func pause() {
-    cpause(1) /// FIXME: Better workaround ?
-}
-
-/// FIXME: Maybe find a better approximation of the C version (which executes 'cycles' times 'nop' in a simple loop)
-func cpause(cycles time.Duration) {
-    time.Sleep(cycles / 10) // time.Sleep is a _huge_ function in comparison with the C version 'cpause'
+    runtime.Gosched() // In order not to fight against the GC...
 }
 
 func optik_get_type_name() string {
@@ -79,7 +74,7 @@ func (ol *Mutex) Get_version_wait() Mutex {
         if !Is_locked(olv) {
             return olv
         }
-        cpause(128)
+        pause()
     }
 }
 
@@ -142,7 +137,7 @@ func (ol *Mutex) Lock_backoff() bool {
             if !Is_locked(ol_old) {
                 break
             }
-            cpause(128)
+            pause()
         }
         if ol.cas(ol_old, ol_old + 1) {
             break
@@ -176,7 +171,7 @@ func (ol *Mutex) Lock_version_backoff(ol_old Mutex) bool {
             if !Is_locked(ol_cur) {
                 break
             }
-            cpause(128)
+            pause()
         }
         if ol.cas(ol_cur, ol_cur + 1) {
             break
