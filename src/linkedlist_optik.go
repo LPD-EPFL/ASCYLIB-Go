@@ -32,6 +32,10 @@ import (
     "tools/optik"
 )
 
+const (
+    FindIsDef bool = true
+)
+
 // -----------------------------------------------------------------------------
 
 type node struct {

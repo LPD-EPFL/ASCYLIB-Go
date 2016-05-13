@@ -35,6 +35,7 @@ import (
 )
 
 const (
+    FindIsDef bool = false
     fraser_max_level = uint(64)
 )
 

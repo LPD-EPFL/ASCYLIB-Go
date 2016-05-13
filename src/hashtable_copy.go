@@ -32,6 +32,7 @@ import (
 )
 
 const (
+    FindIsDef bool = true
     read_only_fail bool = true
 )
 

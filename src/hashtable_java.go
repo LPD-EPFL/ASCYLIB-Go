@@ -36,6 +36,7 @@ import (
 )
 
 const (
+    FindIsDef bool = true
     base_load_factor float32 = 1
     read_only_fail bool = true
 )

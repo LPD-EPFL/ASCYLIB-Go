@@ -35,6 +35,7 @@ import (
 )
 
 const (
+    FindIsDef bool = true
     lazy_ro_fail = true
 )
 

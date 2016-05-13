@@ -31,6 +31,7 @@ import (
 )
 
 const (
+    FindIsDef bool = true
     read_only_fail bool = true
     maxhtlength uint = 65536 // # of buckets
 )

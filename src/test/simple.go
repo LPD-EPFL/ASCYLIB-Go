@@ -19,6 +19,8 @@
  * GNU General Public License for more details.
  *
  * @section DESCRIPTION
+ *
+ * Simple test module.
 **/
 
 package main
@@ -105,13 +107,24 @@ func main() {
         flag.UintVar(&share.NumBuckets, "b", 64, "Amount of buckets for the hash table")
         flag.Parse()
 
-        if put > update {
-            fmt.Printf("** limiting put rate to update rate: old: %v / new: %v\n", put, update)
-            put = update
-        }
-
         assert.Assert(num_threads > 0, "The amount of test threads should be a positive integer")
-        assert.Assert(update <= 100, "The update rate should not be greater than 100 (it is a percentage)")
+
+        if dataset.FindIsDef {
+            assert.Assert(update <= 100, "The update rate should not be greater than 100 (it is a percentage)")
+            if put > update {
+                fmt.Printf("** limiting put rate to update rate: old: %v / new: %v\n", put, update)
+                put = update
+            }
+        } else {
+            assert.Assert(update != 0, "The update rate should not be null for a non-searchable dataset")
+            if put > 100 {
+                fmt.Printf("** limiting put rate to update rate: old: %v / new: 100\n", put)
+                put = 100
+            } else {
+                put = put * 100 / update // Scale put too
+            }
+            update = 100
+        }
 
         if !isPow2(initial) {
             temp := toPow2(initial)

@@ -34,6 +34,7 @@ import (
 )
 
 const (
+    FindIsDef bool = true
     maxlevel = uint(32)
     herlihy_maxlevel = uint(64) // Covers up to 2^64 elements
 )

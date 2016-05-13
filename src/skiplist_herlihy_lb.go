@@ -36,6 +36,7 @@ import (
 )
 
 const (
+    FindIsDef bool = true
     herlihy_max_level = uint(64)
 )
 

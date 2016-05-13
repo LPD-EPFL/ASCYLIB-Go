@@ -33,6 +33,7 @@ import (
 )
 
 const (
+    FindIsDef bool = true
     maxlevel = uint(32)
 )
 

@@ -30,6 +30,10 @@ import (
     "tools/share"
 )
 
+const (
+    FindIsDef bool = true
+)
+
 // -----------------------------------------------------------------------------
 
 type DataSet struct {

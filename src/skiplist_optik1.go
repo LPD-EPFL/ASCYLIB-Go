@@ -45,6 +45,7 @@ import (
 )
 
 const (
+    FindIsDef bool = true
     optik_max_level = uint(64)
 )
 

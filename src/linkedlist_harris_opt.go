@@ -35,6 +35,10 @@ import (
     "unsafe"
 )
 
+const (
+    FindIsDef bool = true
+)
+
 // -----------------------------------------------------------------------------
 
 type node struct {

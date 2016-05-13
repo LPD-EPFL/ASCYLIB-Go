@@ -33,6 +33,7 @@ import (
 )
 
 const (
+    FindIsDef bool = true
     pugh_ro_fail = true
 )
 
