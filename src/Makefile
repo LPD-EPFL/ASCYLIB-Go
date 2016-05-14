@@ -33,7 +33,7 @@ PERF_DUMP  = $(PERF_OUT)_dump
 PERF_TRAIL = _record_dump
 PERF_SUMTR = _summary
 
-.PHONY: build build-all clean run perf-record perf-report perf-all perf-summary
+.PHONY: build build-all run perf-record perf-report perf-report-dump perf-summary perf-all clean
 
 # File rules
 $(PATH_OBJ)/dataset.o: $(NAME).go
