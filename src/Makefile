@@ -25,7 +25,7 @@ CFLAGS = -Wall -g -O2 -I$(PATH_OBJ)
 LD     = gccgo
 LFLAGS = -static-libgo
 PERF   = perf
-PFLAGS =
+PFLAGS = -e instructions:u
 
 # Perf outputs
 PERF_OUT   = $(BIN)_record
@@ -55,12 +55,12 @@ perf-record: $(BIN)
 	@$(PERF) record -o $(PERF_OUT) $(PFLAGS) -- $(BIN) $(ARGS)
 $(PERF_OUT): perf-record
 perf-report: $(PERF_OUT)
-	@$(PERF) report -i $(PERF_OUT) $(PFLAGS)
+	@$(PERF) report -i $(PERF_OUT)
 perf-report-dump: $(PERF_OUT)
-	@$(PERF) report -i $(PERF_OUT) $(PFLAGS) > $(PERF_DUMP)
+	@$(PERF) report -n -t "	" -i $(PERF_OUT) > $(PERF_DUMP)
 perf-summary:
 	@$(MAKE) -C $(PATH_PSM) build
-	@$(foreach dump,$(wildcard $(PATH_BIN)/*$(PERF_TRAIL)),$(PSM) < $(dump) > $(patsubst %$(PERF_TRAIL),%$(PERF_SUMTR),$(dump));)
+	@$(foreach dump,$(wildcard $(PATH_BIN)/*$(PERF_TRAIL)),$(PSM) < $(dump) > $(patsubst %$(PERF_TRAIL),%$(PERF_SUMTR),$(dump)); $(RM) $(dump);)
 perf-all:
 	@$(foreach name,$(DATASET),touch $(name).go; $(MAKE) perf-report-dump NAME=$(name) TEST=$(TEST) ARGS="$(ARGS)";)
 	@$(MAKE) perf-summary

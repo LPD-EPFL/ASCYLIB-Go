@@ -33,82 +33,77 @@ import (
 
 // Account time spend on each "subsection"
 type account struct {
-    dataset float64
-    tools   float64
-    gortime float64
-    crtime  float64
-    kernel  float64
-    pertool map[string]float64
+    total   uint64
+    main    uint64
+    dataset uint64
+    tools   uint64
+    gortime uint64
+    crtime  uint64
+    pertool map[string]uint64
 }
 
 func (acc *account) init() {
-    acc.pertool = make(map[string]float64)
+    acc.pertool = make(map[string]uint64)
 }
 
 func (acc *account) digest(line string) {
-    line = strings.TrimLeft(line, " ")
-
-    percIndex := strings.IndexRune(line, '%')
-    if percIndex == -1 {
-        panic("Percentage not found")
-    }
-    perc, err := strconv.ParseFloat(line[:percIndex], 32)
+    // Fields: Overhead, Samples, Command, Shared Object, Symbol
+    fields := strings.Split(line, "\t")
+    fields[4] = fields[4][4:] // Ignoring "[.] " part of the symbol name
+    // Sample count
+    count, err := strconv.ParseUint(fields[1][1:], 10, 64) // Trim always needed
     if err != nil {
-        panic("Invalid percentage: " + err.Error())
+        panic("Invalid sample count: " + err.Error())
     }
+    acc.total += count
 
-    if strings.Index(line, "[k]") != -1 {
-        acc.kernel += perc
-    } else {
-        line = strings.TrimLeft(line[percIndex + 1:], " ")
-
-        nameOffset := strings.Index(line, "[.]")
-        if nameOffset == -1 {
-            panic("Malformed line")
+    // From test module (main)
+    if fields[4][0:5] == "main." {
+        acc.main += count
+        return
+    }
+    // From dataset module
+    if fields[4][0:11] == "go_dataset." {
+        acc.dataset += count
+        return
+    }
+    // From some tool module
+    if fields[4][0:3] == "go_" {
+        acc.tools += count
+        ptOffset := strings.IndexRune(fields[4], '.')
+        if ptOffset == -1 {
+            panic("Unexpected symbol: " + fields[4])
         }
-
-        symbol := strings.Trim(line[nameOffset + 3:], " ")
-
-        if strings.Index(symbol, "go_dataset.") != -1 {
-            acc.dataset += perc
+        tool := fields[4][3:ptOffset]
+        v, ok := acc.pertool[tool]
+        if ok {
+            acc.pertool[tool] = v + count
         } else {
-            goOffset := strings.Index(symbol, "go_")
-            if goOffset == 0 {
-                acc.tools += perc
-                ptOffset := strings.IndexRune(symbol, '.')
-                if ptOffset == -1 {
-                    panic("Unexpected symbol: " + symbol)
-                }
-                tool := symbol[goOffset + 3:ptOffset]
-                v, ok := acc.pertool[tool]
-                if ok {
-                    acc.pertool[tool] = v + perc
-                } else {
-                    acc.pertool[tool] = perc
-                }
-            } else {
-                commandEndOffset := strings.IndexRune(line, ' ')
-                command := line[:commandEndOffset]
-                if strings.Index(line[commandEndOffset:], command) != -1 {
-                    acc.gortime += perc
-                } else {
-                    acc.crtime += perc
-                }
-            }
+            acc.pertool[tool] = count
         }
+        return
     }
+    // From Go runtime (= from inside the main binary)
+    if fields[2] == fields[3][:len(fields[2])] {
+        acc.gortime += count
+        return
+    }
+    // Else from "C runtime"
+    acc.crtime += count
 }
 
 func (acc *account) output() {
-    fmt.Printf("In dataset\t%.2f%%\n", acc.dataset)
-    fmt.Printf("In tools\t%.2f%%\n", acc.tools)
+    total := float64(acc.total) / 100
+
+    fmt.Printf("In dataset\t%.2f%%\n", float64(acc.dataset) / total)
+    fmt.Printf("In main/test\t%.2f%%\n", float64(acc.main) / total)
+    fmt.Printf("In tools\t%.2f%%\n", float64(acc.tools) / total)
     for k, v := range acc.pertool {
-        fmt.Printf("  - %s\t%.2f%%\n", k, v)
+        fmt.Printf("  - %s\t%.2f%%\n", k, float64(v) / total)
     }
-    fmt.Printf("In runtime\t%.2f%%\n", acc.gortime + acc.crtime)
-    fmt.Printf("  - Go runtime\t%.2f%%\n", acc.gortime)
-    fmt.Printf("  - C  runtime\t%.2f%%\n", acc.crtime)
-    fmt.Printf("In kernel\t%.2f%%\n", acc.kernel)
+    fmt.Printf("In runtime\t%.2f%%\n", float64(acc.gortime + acc.crtime) / total)
+    fmt.Printf("  - Go runtime\t%.2f%%\n", float64(acc.gortime) / total)
+    fmt.Printf("  - C  runtime\t%.2f%%\n", float64(acc.crtime) / total)
 }
 
 // ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
