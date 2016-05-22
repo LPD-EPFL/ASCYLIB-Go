@@ -274,7 +274,7 @@ func main() {
         fmt.Printf("rems: %-10v | %-10v | %10.1f%% | %10.1f%% | %10.1f%%\n", removing_count_total, removing_count_total_succ, removing_perc_succ, removing_perc, (removing_perc * removing_perc_succ) / 100)
 
         throughput := float64(putting_count_total + getting_count_total + removing_count_total) * 1000.0 / actual_duration
-        fmt.Printf("#txs %v\t(%-10.0f)\n", num_threads, throughput)
+        fmt.Printf("#txs %v\t(%-10.0f\n", num_threads, throughput)
         fmt.Printf("#Mops %.3f\n", throughput / 1e6)
     }
 
