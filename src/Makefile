@@ -13,7 +13,7 @@ BIN = $(PATH_BIN)/$(NAME)_$(TEST)
 PSM = perf-summary/bin/ps
 
 # Common sources
-SOURCES = tools/volatile.go tools/xorshift.go tools/assert.go tools/optik.go tools/thread.go tools/share.go dataset.go test/$(TEST).go
+SOURCES = $(wildcard tools/*.go) dataset.go test/$(TEST).go
 OBJECTS = $(SOURCES:%.go=$(PATH_OBJ)/%.o)
 
 # Dataset names
