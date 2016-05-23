@@ -26,6 +26,7 @@
 package dataset
 
 import (
+    "runtime"
     "tools/optik"
     "tools/share"
 )
@@ -124,6 +125,7 @@ func (set *DataSet) Insert(key share.Key, val share.Val) bool {
         if bucket.lock.TryLock_version(pred_ver) {
             break
         }
+        runtime.Gosched() // In order not to fight against the GC
     }
 
     newnode := new_node(key, val, curr)
@@ -154,6 +156,7 @@ func (set *DataSet) Delete(key share.Key) (share.Val, bool) {
         if bucket.lock.TryLock_version(pred_ver) {
             break
         }
+        runtime.Gosched() // In order not to fight against the GC
     }
 
     result := curr.val
