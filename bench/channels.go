@@ -156,7 +156,7 @@ func main() {
         flag.Parse()
 
         if buffer == 0 { // Invalid buffer count
-            panic("Per channel buffer count mcust be greater than 0")
+            panic("Per channel buffer count must be greater than 0")
         }
     }
 
