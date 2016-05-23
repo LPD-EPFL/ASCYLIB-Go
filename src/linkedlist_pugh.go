@@ -29,7 +29,7 @@ package dataset
 
 import (
     "tools/share"
-    "sync"
+    "tools/ttas"
 )
 
 const (
@@ -43,7 +43,7 @@ type node struct {
     key share.Key
     val share.Val
     next *node
-    mutex sync.Mutex
+    mutex ttas.Mutex
 }
 
 type DataSet struct {

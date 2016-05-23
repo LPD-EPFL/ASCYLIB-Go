@@ -29,8 +29,8 @@ package dataset
 
 import (
     "runtime"
-    "sync/atomic"
     "tools/share"
+    "tools/ttas"
     "tools/volatile"
     "unsafe"
 )
@@ -43,35 +43,6 @@ const (
 
 // -----------------------------------------------------------------------------
 
-// Like sync.Mutex because it lacks TryLock...
-type mutex struct {
-    state uint32
-}
-
-func (m *mutex) tryLock() bool {
-    return atomic.CompareAndSwapUint32(&m.state, 0, 1)
-}
-
-func (m *mutex) lock() {
-    for {
-        for { // Wait unlocked state
-            if volatile.ReadUint32(&m.state) == 0 {
-                break
-            }
-        }
-        if atomic.CompareAndSwapUint32(&m.state, 0, 1) {
-            break
-        }
-        runtime.Gosched()
-    }
-}
-
-func (m *mutex) unlock() {
-    atomic.StoreUint32(&m.state, 0)
-}
-
-// -----------------------------------------------------------------------------
-
 type node struct {
     key share.Key
     val share.Val
@@ -81,7 +52,7 @@ type node struct {
 type segment struct {
     num_buckets uint
     hash uint
-    lock mutex
+    lock ttas.Mutex
     modifications uint32
     size uint32
     load_factor float32
@@ -234,7 +205,7 @@ func (set *DataSet) Find(key share.Key) (res share.Val, ok bool) {
 
 func (set *DataSet) Insert(key share.Key, val share.Val) bool {
     var seg *segment
-    var seg_lock *mutex
+    var seg_lock *ttas.Mutex
     seg_num := uint(key) & set.hash
 
     if read_only_fail {
@@ -247,7 +218,7 @@ func (set *DataSet) Insert(key share.Key, val share.Val) bool {
     for {
         seg = (*segment)(volatile.ReadPointer((*unsafe.Pointer)(unsafe.Pointer(&set.segments[seg_num]))))
         seg_lock = &seg.lock
-        if seg_lock.tryLock() {
+        if seg_lock.TryLock() {
             break
         }
         runtime.Gosched()
@@ -258,7 +229,7 @@ func (set *DataSet) Insert(key share.Key, val share.Val) bool {
     var pred *node
     for curr != nil {
         if curr.key == key {
-            seg_lock.unlock()
+            seg_lock.Unlock()
             return false
         }
         pred = curr
@@ -275,14 +246,14 @@ func (set *DataSet) Insert(key share.Key, val share.Val) bool {
             *bucket = n
         }
         seg.size = sizepp
-        seg_lock.unlock()
+        seg_lock.Unlock()
     }
     return true
 }
 
 func (set *DataSet) Delete(key share.Key) (result share.Val, ok bool) {
     var seg *segment
-    var seg_lock *mutex
+    var seg_lock *ttas.Mutex
     seg_num := uint(key) & set.hash
 
     if read_only_fail {
@@ -295,7 +266,7 @@ func (set *DataSet) Delete(key share.Key) (result share.Val, ok bool) {
     for {
         seg = (*segment)(volatile.ReadPointer((*unsafe.Pointer)(unsafe.Pointer(&set.segments[seg_num]))))
         seg_lock = &seg.lock
-        if seg_lock.tryLock() {
+        if seg_lock.TryLock() {
             break
         }
         runtime.Gosched()
@@ -313,12 +284,12 @@ func (set *DataSet) Delete(key share.Key) (result share.Val, ok bool) {
                 *bucket = curr.next
             }
             seg.size--
-            seg_lock.unlock()
+            seg_lock.Unlock()
             return curr.val, true
         }
         pred = curr
         curr = curr.next
     }
-    seg_lock.unlock()
+    seg_lock.Unlock()
     return 0, false
 }

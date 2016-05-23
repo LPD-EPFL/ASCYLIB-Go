@@ -28,9 +28,9 @@
 package dataset
 
 import (
-    "sync"
     "sync/atomic"
     "tools/share"
+    "tools/ttas"
     "unsafe"
 )
 
@@ -46,7 +46,7 @@ type node struct {
     val share.Val
     next *node
     marked bool
-    mutex sync.Mutex
+    mutex ttas.Mutex
 }
 
 type DataSet struct {

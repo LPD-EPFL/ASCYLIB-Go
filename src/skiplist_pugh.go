@@ -27,9 +27,9 @@
 package dataset
 
 import (
-    "sync"
     "tools/assert"
     "tools/share"
+    "tools/ttas"
     "tools/xorshift"
 )
 
@@ -45,7 +45,7 @@ type node struct {
     key share.Key
     val share.Val
     toplevel uint32
-    lock sync.Mutex
+    lock ttas.Mutex
     next []*node
 }
 

@@ -27,8 +27,8 @@
 package dataset
 
 import (
-    "sync"
     "tools/share"
+    "tools/ttas"
 )
 
 const (
@@ -51,7 +51,7 @@ type array struct {
 type DataSet struct {
     num_buckets uint
     hash uint
-    lock []sync.Mutex
+    lock []ttas.Mutex
     arrays []*array
 }
 
@@ -79,7 +79,7 @@ func New() *DataSet {
     set := new(DataSet)
     set.num_buckets = share.NumBuckets
     set.hash = set.num_buckets - 1
-    set.lock = make([]sync.Mutex, share.NumBuckets)
+    set.lock = make([]ttas.Mutex, share.NumBuckets)
     set.arrays = make([]*array, share.NumBuckets)
     for i := uint(0); i < set.num_buckets; i++ {
         set.arrays[i] = new_array(0)

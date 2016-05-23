@@ -26,8 +26,8 @@
 package dataset
 
 import (
-    "sync"
     "tools/share"
+    "tools/ttas"
 )
 
 const (
@@ -45,8 +45,8 @@ type node struct {
 type DataSet struct {
     head *node
     tail *node
-    head_lock sync.Mutex
-    tail_lock sync.Mutex
+    head_lock ttas.Mutex
+    tail_lock ttas.Mutex
 }
 
 // -----------------------------------------------------------------------------

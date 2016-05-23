@@ -29,8 +29,8 @@ package dataset
 
 import (
     "runtime"
-    "sync"
     "tools/share"
+    "tools/ttas"
     "tools/volatile"
     "tools/xorshift"
 )
@@ -48,7 +48,7 @@ type node struct {
     toplevel uint32
     marked bool
     fullylinked bool
-    lock sync.Mutex
+    lock ttas.Mutex
     next []*node
 }
 
