@@ -93,8 +93,6 @@ func main() {
     var put uint
     var load_factor uint
 
-    var update_rate, put_rate, get_rate float64
-
     { // Parameters
         flag.UintVar(&duration, "d", 1000, "Test duration in milliseconds")
         flag.UintVar(&initial, "i", 1024, "Number of elements to insert before test")
@@ -152,13 +150,6 @@ func main() {
             fmt.Printf("** rounding up range (to make it power of 2): old: %v / new: %v\n", rng, temp)
             rng = temp
         }
-        update_rate = float64(update) / 100
-        if put >= 0 {
-            put_rate = float64(put) / 100
-        } else {
-            put_rate = float64(update_rate) / 2
-        }
-        get_rate = 1 - update_rate
     }
 
     set := dataset.New()
