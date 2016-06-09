@@ -12,8 +12,9 @@ PATH_PSM = perf-summary/src
 BIN = $(PATH_BIN)/$(NAME)_$(TEST)
 PSM = perf-summary/bin/ps
 
-# Common sources
-SOURCES = $(wildcard tools/*.go) dataset.go test/$(TEST).go
+# Common sources ('TOOLS' in a specific order', $(wildcard tools/*.go) would not be valid)
+TOOLS   = assert volatile xorshift share optik thread ttas
+SOURCES = $(TOOLS:%=tools/%.go) dataset.go test/$(TEST).go
 OBJECTS = $(SOURCES:%.go=$(PATH_OBJ)/%.o)
 
 # Dataset names
