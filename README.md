@@ -17,7 +17,7 @@ The list of *data structures* can be found in **src/**.
 Still from **src/**, run:
 
     make run NAME=<data structure name> [ TEST=<test module name> ]
-    
+
 Or from **bin/**, run:
 
     ./<data structure name>_<test module name>
