@@ -6,11 +6,9 @@ ARGS = -n 2
 # Common paths
 PATH_OBJ = .
 PATH_BIN = ../bin
-PATH_PSM = perf-summary/src
 
 # Common binaries
 BIN = $(PATH_BIN)/$(NAME)_$(TEST)
-PSM = perf-summary/bin/ps
 
 # Common sources ('TOOLS' in a specific order', $(wildcard tools/*.go) would not be valid)
 TOOLS   = assert volatile xorshift share optik thread ttas
@@ -29,12 +27,9 @@ PERF   = perf
 PFLAGS = -e instructions:u
 
 # Perf outputs
-PERF_OUT   = $(BIN)_record
-PERF_DUMP  = $(PERF_OUT)_dump
-PERF_TRAIL = _record_dump
-PERF_SUMTR = _summary
+PERF_OUT = $(BIN)_record
 
-.PHONY: build build-all run perf-record perf-report perf-report-dump perf-summary perf-all clean
+.PHONY: build build-all run perf-record perf-report perf-all clean
 
 # File rules
 $(PATH_OBJ)/dataset.o: $(NAME).go
@@ -57,15 +52,8 @@ perf-record: $(BIN)
 $(PERF_OUT): perf-record
 perf-report: $(PERF_OUT)
 	@$(PERF) report -i $(PERF_OUT)
-perf-report-dump: $(PERF_OUT)
-	@$(PERF) report -n -t "	" -i $(PERF_OUT) > $(PERF_DUMP)
-perf-summary:
-	@$(MAKE) -C $(PATH_PSM) build
-	@$(foreach dump,$(wildcard $(PATH_BIN)/*$(PERF_TRAIL)),$(PSM) < $(dump) > $(patsubst %$(PERF_TRAIL),%$(PERF_SUMTR),$(dump)); $(RM) $(dump);)
 perf-all:
-	@$(foreach name,$(DATASET),touch $(name).go; $(MAKE) perf-report-dump NAME=$(name) TEST=$(TEST) ARGS="$(ARGS)";)
-	@$(MAKE) perf-summary
+	@$(foreach name,$(DATASET),touch $(name).go; $(MAKE) perf-record NAME=$(name) TEST=$(TEST) ARGS="$(ARGS)";)
 
 clean:
 	$(RM) tools/*.o test/*.o $(PATH_OBJ)/*.o $(PATH_BIN)/*
-	@$(MAKE) -C $(PATH_PSM) clean
