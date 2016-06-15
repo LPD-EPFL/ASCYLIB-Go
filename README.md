@@ -102,21 +102,36 @@ R. Treiber.
 *Systems Programming: Coping with Parallelism*.
 Technical report, 1986.
 
+Tests modules
+-------------
+
+There is a few test modules available.
+All of them execute a concurrent algorithm following variable parameters.
+
+To get the accepted parameters, issue from **src/**:
+
+    make run NAME=<concurrent algorithm name> [ TEST=<test module name> ARGS=-h ]
+
+The default test module, 'simple', is the same as in ASCYLIB (https://github.com/LPD-EPFL/ASCYLIB/blob/master/src/tests/test_simple.c).
+
+The three other ones are to get metrics about the Go runtime while performing the same work as the 'simple' test module.
+You will need `go tool {trace, pprof}` version 1.6 or higher to build and use those metrics.
+
 Compilation
 -----------
 
-# Build a test binary
+### Build a test binary
 
-*You will need `gccgo` and `make` to build a test binary.*
+You will need `gccgo` and `make` to build a test binary.
 
 To build a test binary (= *test code* + *concurrent algorithm* to test), in **src/**, run:
 
     make build NAME=<concurrent algorithm name> [ TEST=<test module name> ]
 
 The TEST parameter is optional (don't put brackets!).
-The *simple* test module is selected by default.
+The 'simple' test module is selected by default.
 
-# Run a test binary
+### Run a test binary
 
 Still from **src/**, run:
 
@@ -125,19 +140,6 @@ Still from **src/**, run:
 Or from **bin/**, run:
 
     ./<concurrent algorithm name>_<test module name>
-
-Tests modules
--------------
-
-There is a few test modules available.
-All of them execute a concurrent algorithm following variable parameters.
-To get the accepted parameters, issue from **src/**:
-
-    make run NAME=<concurrent algorithm name> [ TEST=<test module name> ARGS=-h ]
-
-The default test module, 'simple', is the same as in ASCYLIB (https://github.com/LPD-EPFL/ASCYLIB/blob/master/src/tests/test_simple.c).
-The three other ones are to get metrics about the Go runtime while performing the same work as the 'simple' test module.
-You will need `go tool {trace, pprof}` version 1.6 or higher to use those metrics.
 
 Thanks
 ------
