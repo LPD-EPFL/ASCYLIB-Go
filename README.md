@@ -110,7 +110,7 @@ All of them execute a concurrent algorithm following variable parameters.
 
 To get the accepted parameters, issue from **src/**:
 
-    make run NAME=<concurrent algorithm name> [ TEST=<test module name> ARGS=-h ]
+    make run NAME=<concurrent algorithm name> TEST=simple ARGS=-h
 
 The default test module, 'simple', is the same as in ASCYLIB (https://github.com/LPD-EPFL/ASCYLIB/blob/master/src/tests/test_simple.c).
 
