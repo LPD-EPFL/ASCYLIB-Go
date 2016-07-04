@@ -61,11 +61,11 @@ func (n *node) unlock() {
 }
 
 func new_node(key share.Key, val share.Val, next *node) *node {
-    node := new(node)
-    node.key = key
-    node.val = val
-    node.next = next
-    return node
+    elem := new(node)
+    elem.key = key
+    elem.val = val
+    elem.next = next
+    return elem
 }
 
 func (set *DataSet) search_weak_left(key share.Key) *node {
@@ -103,7 +103,8 @@ func (set *DataSet) search_strong_cond(key share.Key, equal bool) (pred *node, s
     pred = set.search_weak_left(key)
     succ = pred.next
     if (succ.key == key) == equal {
-        return nil, nil, false
+        ok = false
+        return
     }
     pred.lock()
     succ = pred.next
@@ -132,7 +133,7 @@ func (set *DataSet) Destroy() {
 
 func (set *DataSet) Size() uint {
     var size uint = 0
-    node := set.head.next // We have at least 2 elements
+    node := set.head.next
     for node.next != nil {
         size++
         node = node.next
@@ -149,9 +150,7 @@ func (set *DataSet) Find(key share.Key) (share.Val, bool) {
 }
 
 func (set *DataSet) Insert(key share.Key, val share.Val) bool {
-    result := true
     var left, right *node
-    // Optimize for step-wise strong search: if found, return before locking!
     if pugh_ro_fail {
         var ok bool
         left, right, ok = set.search_strong_cond(key, true)
@@ -162,12 +161,12 @@ func (set *DataSet) Insert(key share.Key, val share.Val) bool {
         left, right = set.search_strong(key)
     }
     if right.key == key {
-        result = false
-    } else {
-        left.next = new_node(key, val, left.next)
+        left.unlock()
+        return false
     }
+    left.next = new_node(key, val, left.next)
     left.unlock()
-    return result
+    return true
 }
 
 func (set *DataSet) Delete(key share.Key) (result share.Val, ok bool) {
@@ -180,14 +179,15 @@ func (set *DataSet) Delete(key share.Key) (result share.Val, ok bool) {
     } else {
         left, right = set.search_strong(key)
     }
+    ok = false
     if right.key == key {
-      right.lock()
-      result = right.val
-      left.next = right.next
-      right.next = left
-      right.unlock()
+        right.lock()
+        result = right.val
+        left.next = right.next
+        right.next = left
+        right.unlock()
+        ok = true
     }
     left.unlock()
-    ok = true
     return
 }
