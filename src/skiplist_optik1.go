@@ -39,6 +39,7 @@
 package dataset
 
 import (
+    "runtime"
     "tools/optik"
     "tools/share"
     "tools/xorshift"
@@ -122,6 +123,7 @@ restart:
             currv = curr.lock
         }
         if optik.Is_deleted(predv) {
+            runtime.Gosched() // In order not to fight with the GC
             goto restart
         }
         preds[i] = pred

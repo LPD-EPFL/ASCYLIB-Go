@@ -116,6 +116,7 @@ restart:
         if preds != nil {
             preds[i] = pred
             if pred.marked {
+                runtime.Gosched() // In order not to fight with the GC
                 goto restart
             }
         }
