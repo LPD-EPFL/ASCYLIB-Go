@@ -141,7 +141,7 @@ func main() {
         }
         fmt.Printf("## Initial: %v / Range: %v\n", initial, rng)
         {
-            var kb float64 = float64(initial) * float64(unsafe.Sizeof(uint)) / 1024
+            var kb float64 = float64(initial) * float64(unsafe.Sizeof(uint(0))) / 1024
             var mb float64 = kb / 1024
             fmt.Printf("Sizeof initial: %.2f KB = %.2f MB\n", kb, mb)
         }
@@ -166,7 +166,7 @@ func main() {
     }
 
     var barrier sync.WaitGroup
-    test := func(id uint, stats *stats_t) {
+    test := func(stats *stats_t) {
         var xorshf xorshift.State
         xorshf.Init()
         for volatile.ReadInt32(&running) != 0 {
@@ -209,12 +209,11 @@ func main() {
             } else {
                 fmt.Print(", ", i)
             }
-            id := i
             thread.Spawn(func() {
                 stats := new(stats_t)
                 barrier.Wait()
 
-                test(id, stats)
+                test(stats)
 
                 // Global stats update
                 atomic.AddUint64(&putting_count_total, stats.putting_count)
