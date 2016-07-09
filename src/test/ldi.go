@@ -98,6 +98,7 @@ func main() {
     var update uint
     var put uint
     var load_factor uint
+    var only_results bool
 
     { // Parameters
         flag.UintVar(&duration, "d", 1000, "Test duration in milliseconds")
@@ -109,6 +110,7 @@ func main() {
         flag.UintVar(&load_factor, "c", 1, "Load factor for the hash table")
         flag.UintVar(&share.Concurrency, "l", 512, "Concurrency level for the hash table")
         flag.UintVar(&share.NumBuckets, "b", 64, "Amount of buckets for the hash table")
+        flag.BoolVar(&only_results, "o", false, "Only print operation latencies")
         flag.Parse()
 
         assert.Assert(num_threads > 0, "The amount of test threads should be a positive integer")
@@ -116,13 +118,17 @@ func main() {
         if dataset.FindIsDef {
             assert.Assert(update <= 100, "The update rate should not be greater than 100 (it is a percentage)")
             if put > update {
-                fmt.Printf("** limiting put rate to update rate: old: %v / new: %v\n", put, update)
+                if !only_results {
+                    fmt.Printf("** limiting put rate to update rate: old: %v / new: %v\n", put, update)
+                }
                 put = update
             }
         } else {
             assert.Assert(update != 0, "The update rate should not be null for a non-searchable dataset")
             if put > 100 {
-                fmt.Printf("** limiting put rate to update rate: old: %v / new: 100\n", put)
+                if !only_results {
+                    fmt.Printf("** limiting put rate to update rate: old: %v / new: 100\n", put)
+                }
                 put = 100
             } else {
                 put = put * 100 / update // Scale put too
@@ -132,28 +138,38 @@ func main() {
 
         if !isPow2(initial) {
             temp := toPow2(initial)
-            fmt.Printf("** rounding up initial (to make it power of 2): old: %v / new: %v\n", initial, temp)
+            if !only_results {
+                fmt.Printf("** rounding up initial (to make it power of 2): old: %v / new: %v\n", initial, temp)
+            }
             initial = temp
         }
         share.Capacity = initial / load_factor
         share.LevelMax = log2(initial)
         if !isPow2(share.Concurrency) {
             temp := toPow2(share.Concurrency)
-            fmt.Printf("** rounding up concurrency (to make it power of 2): old: %v / new: %v\n", share.Concurrency, temp)
+            if !only_results {
+                fmt.Printf("** rounding up concurrency (to make it power of 2): old: %v / new: %v\n", share.Concurrency, temp)
+            }
             share.Concurrency = temp
         }
         if rng < initial {
             rng = 2 * initial
         }
-        fmt.Printf("## Initial: %v / Range: %v\n", initial, rng)
+        if !only_results {
+            fmt.Printf("## Initial: %v / Range: %v\n", initial, rng)
+        }
         {
             var kb float64 = float64(initial) * float64(unsafe.Sizeof(uint(0))) / 1024
             var mb float64 = kb / 1024
-            fmt.Printf("Sizeof initial: %.2f KB = %.2f MB\n", kb, mb)
+            if !only_results {
+                fmt.Printf("Sizeof initial: %.2f KB = %.2f MB\n", kb, mb)
+            }
         }
         if !isPow2(rng) {
             temp := toPow2(rng)
-            fmt.Printf("** rounding up range (to make it power of 2): old: %v / new: %v\n", rng, temp)
+            if !only_results {
+                fmt.Printf("** rounding up range (to make it power of 2): old: %v / new: %v\n", rng, temp)
+            }
             rng = temp
         }
     }
@@ -161,7 +177,9 @@ func main() {
     var calibration float64 // "Net weight" latency
 
     { // Calibration to remove call overhead
-        fmt.Printf("Net latency: ")
+        if !only_results {
+            fmt.Printf("Net latency: ")
+        }
         calibration = func() float64 {
             var avgs [calibrate_reps]float64 // Averages (from 'inner' loop)
             var gavg float64 // Average of avgs
@@ -196,19 +214,25 @@ func main() {
                 return closest
             }
         }()
-        fmt.Printf("%.2f ns\n", calibration)
+        if !only_results {
+            fmt.Printf("%.2f ns\n", calibration)
+        }
     }
 
     set := dataset.New()
     var size uint
 
     { // DataSet initialization (kept while not found in test_simple.c)
-        fmt.Printf("Adding %v entries to set...", initial)
+        if !only_results {
+            fmt.Printf("Adding %v entries to set...", initial)
+        }
         for i := initial; i > 0; i-- {
             set.Insert(share.Key(i), 0)
         }
         size = set.Size()
-        fmt.Printf(" done.\n")
+        if !only_results {
+            fmt.Printf(" done.\n")
+        }
         assert.Assert(size == initial, fmt.Sprintf("Single-threaded set initialization failed: set size = %v", size))
     }
 
@@ -247,12 +271,16 @@ func main() {
 
     { // Creating threads
         barrier.Add(1)
-        fmt.Print("Creating threads: ")
+        if !only_results {
+            fmt.Print("Creating threads: ")
+        }
         for i := uint(0); i < num_threads; i++ {
-            if i == 0 {
-                fmt.Print(i)
-            } else {
-                fmt.Print(", ", i)
+            if !only_results {
+                if i == 0 {
+                    fmt.Print(i)
+                } else {
+                    fmt.Print(", ", i)
+                }
             }
             thread.Spawn(func() {
                 stats := new(stats_t)
@@ -269,11 +297,15 @@ func main() {
                 atomic.AddUint64(&remove_time_total, stats.remove_time)
             })
         }
-        fmt.Println()
+        if !only_results {
+            fmt.Println()
+        }
     }
 
     { // Running threads
-        fmt.Println("*** RUNNING ***")
+        if !only_results {
+            fmt.Println("*** RUNNING ***")
+        }
         atomic.StoreInt32(&running, 1)
         barrier.Done() // Threads were waiting for it
 
@@ -281,7 +313,9 @@ func main() {
 
         atomic.StoreInt32(&running, 0)
         thread.WaitAll() // Wait for threads to update global statistics
-        fmt.Println("*** STOPPED ***")
+        if !only_results {
+            fmt.Println("*** STOPPED ***")
+        }
     }
 
     { // Statistics correction
@@ -319,10 +353,14 @@ func main() {
         put_lat := 1000 * put_time_ms / float64(put_count_total)
         remove_lat := 1000 * remove_time_ms / float64(remove_count_total)
 
-        fmt.Printf("    : %-10s | %-11s | %-10s | %s\n", "count", "% total", "time (ms)", "latency (µs/ops)")
-        fmt.Printf("srch: %-10v | %10.1f%% | %10.1f | %16.3f\n", get_count_total, get_perc, get_time_ms, get_lat)
-        fmt.Printf("insr: %-10v | %10.1f%% | %10.1f | %16.3f\n", put_count_total, put_perc, put_time_ms, put_lat)
-        fmt.Printf("rems: %-10v | %10.1f%% | %10.1f | %16.3f\n", remove_count_total, remove_perc, remove_time_ms, remove_lat)
+        if only_results {
+            fmt.Printf("%v\n%v\n%v\n", get_lat, put_lat, remove_lat)
+        } else {
+            fmt.Printf("    : %-10s | %-11s | %-10s | %s\n", "count", "% total", "time (ms)", "latency (µs/ops)")
+            fmt.Printf("srch: %-10v | %10.1f%% | %10.1f | %16.3f\n", get_count_total, get_perc, get_time_ms, get_lat)
+            fmt.Printf("insr: %-10v | %10.1f%% | %10.1f | %16.3f\n", put_count_total, put_perc, put_time_ms, put_lat)
+            fmt.Printf("rems: %-10v | %10.1f%% | %10.1f | %16.3f\n", remove_count_total, remove_perc, remove_time_ms, remove_lat)
+        }
     }
 
     set.Destroy()
