@@ -1,7 +1,6 @@
 # Ignore everything in this directory
 *
-# Except those files/folders
+# Except those files
 !.gitignore
 !Makefile
-!*.go
-!latency
+!*.cpp
