@@ -1,5 +1,5 @@
 /**
- * @file   ldi.cpp
+ * @file   tester.cpp
  * @author Sébastien Rouault <sebastien.rouault@epfl.ch>
  *
  * @section LICENSE
