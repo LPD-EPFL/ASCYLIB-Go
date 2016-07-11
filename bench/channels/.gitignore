@@ -1,4 +1,6 @@
 # Ignore everything in this directory and subdirectories
 *
-# Except this file
+# Except those files
 !.gitignore
+!Makefile
+!*.go

@@ -1,6 +1,7 @@
 # Ignore everything in this directory
-*
-# Except those files
+/*
+# Except those files/folders
 !.gitignore
 !Makefile
 !*.cpp
+!results
