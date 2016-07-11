@@ -52,7 +52,7 @@ namespace Constants {
     constexpr nat_t reps = 5; // Amount of repetitions
     constexpr nat_t load[] = { 0, 20, 50, 100 }; // Loads tested
     constexpr nat_t load_length = sizeof(load) / sizeof(nat_t); // Number of elements in table 'load'
-    constexpr nat_t core_divs = 8; // Number of divisions
+    constexpr nat_t core_divs = 32; // Number of divisions
     static_assert(Constants::core_divs >= 1, "Not enough divisions (at least 1)");
 }
 
@@ -318,6 +318,8 @@ int main(int argc, char** argv) {
         std::cout << "Output file '" << filename << "'" << std::endl;
         for (nat_t core = 0; core <= core_divs; core++) {
             nat_t cores_in_use = (core == 0 ? 1 : cores * core / core_divs); // Number of cores in use
+            if (cores_in_use == 1 && core != 0)
+                continue;
             std::cout << "  With " << cores_in_use << " core(s): ";
             fout << cores_in_use << "\t";
             for (nat_t bin = 0; bin < bins_length; bin++) {
