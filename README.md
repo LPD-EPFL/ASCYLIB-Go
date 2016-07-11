@@ -114,6 +114,8 @@ To get the accepted parameters, issue from **src/**:
 
 The default test module, 'simple', is the same as in ASCYLIB (https://github.com/LPD-EPFL/ASCYLIB/blob/master/src/tests/test_simple.c).
 
+The 'ldi' test module performs simple latency measurements, for each operation (find, insert, remove).
+
 The three other ones are to get metrics about the Go runtime while performing the same work as the 'simple' test module.
 You will need `go tool {trace, pprof}` version 1.6 or higher to build and use those metrics.
 
