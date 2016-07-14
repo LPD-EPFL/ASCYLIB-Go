@@ -1,0 +1,3 @@
+# Ignore every eps/pdf file
+*.eps
+*.pdf

@@ -1,0 +1,56 @@
+[file_prefs]
+final_new_line=true
+ensure_convert_new_lines=true
+strip_trailing_spaces=true
+replace_tabs=true
+
+[indentation]
+indent_width=4
+indent_type=0
+indent_hard_tab_width=8
+detect_indent=false
+detect_indent_width=false
+indent_mode=2
+
+[project]
+name=ASCYLIB-Go
+base_path=/home/seb/EPFL/Été 1/Vasilis/ASCYLIB-Go
+description=
+file_patterns=
+
+[long line marker]
+long_line_behaviour=1
+long_line_column=72
+
+[files]
+current_page=0
+FILE_NAME_0=65;Make;0;EUTF-8;1;1;0;%2Fhome%2Fseb%2FEPFL%2FÉté%201%2FVasilis%2FASCYLIB-Go%2Fsrc%2FMakefile;0;4
+
+[VTE]
+last_dir=/home/seb/EPFL/Été 1/Vasilis
+
+[build-menu]
+EX_00_LB=
+EX_00_CM=
+EX_00_WD=
+GoFT_00_LB=
+GoFT_00_CM=
+GoFT_00_WD=
+GoFT_02_LB=
+GoFT_02_CM=
+GoFT_02_WD=
+filetypes=Go;
+NF_00_LB=
+NF_00_CM=
+NF_00_WD=
+NF_01_LB=Build...
+NF_01_CM=make build NAME=
+NF_01_WD=%p/src
+NF_02_LB=Clean
+NF_02_CM=make clean
+NF_02_WD=%p/src
+
+[editor]
+line_wrapping=false
+line_break_column=80
+auto_continue_multiline=true

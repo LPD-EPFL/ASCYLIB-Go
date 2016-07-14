@@ -2,8 +2,6 @@
 /*
 # Except those files/folders
 !.gitignore
-!NOTES
 !Makefile
-!bin
-!src
-!test
+!*.cpp
+!results

@@ -1,0 +1,1 @@
+../linkedlist_optik.go

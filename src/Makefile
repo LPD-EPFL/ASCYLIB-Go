@@ -10,21 +10,15 @@ PATH_BIN = ../bin
 # Common binaries
 BIN = $(PATH_BIN)/$(NAME)_$(TEST)
 
-# Common sources ('TOOLS' in a specific order', $(wildcard tools/*.go) would not be valid)
-TOOLS   = assert volatile xorshift share optik thread ttas
-SOURCES = $(TOOLS:%=tools/%.go) dataset.go test/$(TEST).go
-OBJECTS = $(SOURCES:%.go=$(PATH_OBJ)/%.o)
-
 # Dataset names
 DATASET = $(patsubst %.go,%,$(subst base.go,,$(wildcard *.go)))
 
 # Compiler/linker/perf-related options
-CC     = gccgo
-CFLAGS = -Wall -g -O2 -I$(PATH_OBJ)
-LD     = gccgo
-LFLAGS = -static-libgo
+CC     = go build
+CFLAGS =
 PERF   = perf
 PFLAGS = -e instructions:u
+LN     = ln -s
 
 # Perf outputs
 PERF_OUT = $(BIN)_record
@@ -32,12 +26,9 @@ PERF_OUT = $(BIN)_record
 .PHONY: build build-all run perf-record perf-report perf-all clean
 
 # File rules
-$(PATH_OBJ)/dataset.o: $(NAME).go
-	$(CC) $(CFLAGS) -c -o $@ $<
-$(PATH_OBJ)/%.o: %.go
-	$(CC) $(CFLAGS) -c -o $@ $<
-$(BIN): $(OBJECTS)
-	$(LD) $(LFLAGS) -o $@ $^
+$(BIN): Makefile $(NAME).go $(wildcard test/$(TEST)/*) $(wildcard tools/*/*.go)
+	$(RM) dataset/dataset.go; $(LN) ../$(NAME).go dataset/dataset.go
+	export GOPATH="$(abspath ..)"; $(CC) $(CFLAGS) -o $(BIN) test/$(TEST)
 
 # Command rules
 build: $(BIN)
@@ -56,4 +47,4 @@ perf-all:
 	@$(foreach name,$(DATASET),touch $(name).go; $(MAKE) perf-record NAME=$(name) TEST=$(TEST) ARGS="$(ARGS)";)
 
 clean:
-	$(RM) tools/*.o test/*.o $(PATH_OBJ)/*.o $(PATH_BIN)/*
+	$(RM) $(PATH_BIN)/*

@@ -1,0 +1,3 @@
+In this directory: 'make build' to compile the channel µ-bench program.
+
+The makefile in bin/ can be used for testing purpose.

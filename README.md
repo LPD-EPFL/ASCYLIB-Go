@@ -124,7 +124,7 @@ Compilation
 
 ### Build a test binary
 
-You will need `gccgo` and `make` to build a test binary.
+You will need `make` and `go` 1.6 or higher to build all test binaries.
 
 To build a test binary (= *test code* + *concurrent algorithm* to test), in **src/**, run:
 

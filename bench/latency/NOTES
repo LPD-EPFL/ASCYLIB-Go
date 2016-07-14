@@ -1,0 +1,4 @@
+Compile with 'ldi' test module to perform simple latency measurements.
+
+After having moved the binaries to test into the bin/ directory,
+the makefile in bin/ can be used for testing purpose.
