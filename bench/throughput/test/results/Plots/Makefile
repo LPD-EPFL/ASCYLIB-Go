@@ -1,7 +1,7 @@
-PLOTS = $(subst gp,eps,$(filter-out gp/style.gp,$(wildcard gp/*.gp)))
+PLOTS = $(subst gp,pdf,$(filter-out gp/style.gp,$(wildcard gp/*.gp)))
 
 .PHONY: all
 
-eps/%.eps: gp/%.gp
+pdf/%.pdf: gp/%.gp
 	gnuplot $^
 all: $(PLOTS)

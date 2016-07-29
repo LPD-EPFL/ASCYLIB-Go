@@ -6,9 +6,9 @@ PSIZE = "set size 0.3, 0.5"
 
 set key horiz maxrows 1
 
-set output "eps/ht_optik.eps"
+set output "pdf/ht_optik.pdf"
 
-set terminal eps enhanced size 10,5
+set terminal pdf enhanced size 10,5
 set rmargin 0
 set lmargin 3
 set tmargin 3

@@ -6,9 +6,9 @@ PSIZE = "set size 0.42, 0.5"
 
 set key horiz maxrows 1
 
-set output 'eps/single.'.hostname.'.'.mode.'.s'.servers.'.eps'
+set output 'pdf/single.'.hostname.'.'.mode.'.s'.servers.'.pdf'
 
-set terminal eps enhanced size 6.5,5
+set terminal pdf enhanced size 6.5,5
 set rmargin 0
 set lmargin 3
 set tmargin 3
