@@ -113,12 +113,12 @@ private:
     class Parser final {
     private:
         val_t current; // Current value
-        nat_t pt_pos;  // Position after the point (0 for before)
+        val_t factor;  // Position factor, 1 for "before point"
         bool  is_nan;  // True if not a number, false otherwise
     public:
         /** Constructor.
         **/
-        Parser(): current(0), pt_pos(0), is_nan(false) {
+        Parser(): current(0.), factor(1.), is_nan(false) {
         }
     public:
         /** Push a table of characters, ended by a new line '\n'.
@@ -135,21 +135,19 @@ private:
                 if (c == '\n')
                     return i + 1;
                 if (c == '.' || c == ',') {
-                    if (pt_pos != 0) // NaN
+                    if (factor != 1) // NaN
                         goto setNaN;
-                    pt_pos = 1;
+                    factor = 0.1;
                     continue;
                 }
                 if (c < '0' || c > '9') // NaN
                     goto setNaN;
-                if (pt_pos == 0) { // Before '.'
+                if (factor == 1) { // Before '.'
                     current = current * 10 + static_cast<val_t>(c - '0');
                 } else { // After '.'
                     val_t n = static_cast<val_t>(c - '0');
-                    for (nat_t j = 0; j < pt_pos; j++)
-                        n /= 10;
-                    current += n;
-                    pt_pos++;
+                    current += factor * n;
+                    factor /= 10;
                 }
             }
             return 0;
@@ -173,7 +171,7 @@ private:
         val_t reset() {
             val_t ret = current;
             current = 0;
-            pt_pos = 0;
+            factor = 1;
             is_nan = false;
             return ret;
         }
@@ -304,10 +302,7 @@ int main(int argc, char** argv) {
                 filename.append(".");
                 filename.append(Constants::mode_names[mode]); // Mode name
                 filename.append(".s");
-                { // Number of servers
-                    Converter<> server_text(servers_in_use);
-                    filename.append(server_text);
-                }
+                filename.append(Converter<>(servers_in_use)); // Number of servers
                 filename.append(".dat");
             }
             std::ofstream fout;
@@ -317,7 +312,7 @@ int main(int argc, char** argv) {
                     std::cerr << "Unable to write file '" << filename << "'" << std::endl;
                     return 1;
                 }
-                fout << "#clients\t#messages\tthroughput (MB/s)\tlatency (µs/msg)" << std::endl;
+                fout << "#clients\t#messages\tthroughput (MB/s)\tlatency (µs)" << std::endl;
             }
             std::cout << "Output file '" << filename << "'" << std::endl;
             for (nat_t client = 0; client <= clients_divs; client++) {
@@ -331,7 +326,7 @@ int main(int argc, char** argv) {
                     fout << clients_text << "\t";
                 }
                 { // Measurements
-                    val_t values[3] = { 0 };
+                    val_t values[3] = { 0. }; // Arithmetic means of { msg size (bytes), msg exchanges, test duration (ns) }
                     for (nat_t i = 0; i < Constants::reps; i++) { // Repetitions, keep average
                         Test test(argv[1]);
                         if (!test.run(mode, servers_in_use, clients_in_use)) // Unable to load the binary
@@ -340,8 +335,11 @@ int main(int argc, char** argv) {
                         for (nat_t j = 0; j < 3; j++)
                             values[j] += test.values[j] / Constants::reps;
                     }
-                    for (nat_t i = 0; i < 3; i++)
-                        fout << values[i] << "\t";
+                    { // Compute then output useful values
+                        val_t throughput = values[1] * 1000. / values[2] * values[0]; // Global throughput (MB/s)
+                        val_t latency = values[2] / 1000. / values[1] * static_cast<val_t>(clients_in_use); // Latency (µs) to send one message for one client
+                        fout << values[1] << "\t" << throughput << "\t" << latency;
+                    }
                 }
                 std::cout << "done." << std::endl;
                 fout << std::endl;

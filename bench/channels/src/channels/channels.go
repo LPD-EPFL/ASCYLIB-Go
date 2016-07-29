@@ -199,13 +199,12 @@ func main() {
     }
 
     { // Statistics (duration is here in ns)
-        xchg := 2 * gbflow
-        tput := float64(xchg * uint64(unsafe.Sizeof(message{0, make(chan(message))}))) * 1000 / float64(duration)
-        avgl := float64(duration) * float64(nbclients) / (1000 * float64(xchg)) // Supposing time(chan send/recv) >> time(local ops) -- not true actually! use 'shared' mode for lowest time(local ops)
-
         if only_results {
-            fmt.Printf("%v\n%v\n%v\n", xchg, tput, avgl)
+            fmt.Printf("%v\n%v\n%v\n", unsafe.Sizeof(message{0, make(chan(message))}), 2 * gbflow, duration)
         } else {
+            xchg := 2 * gbflow
+            tput := float64(xchg * uint64(unsafe.Sizeof(message{0, make(chan(message))}))) * 1000 / float64(duration)
+            avgl := float64(duration) * float64(nbclients) / (1000 * float64(xchg)) // Supposing time(chan send/recv) >> time(local ops) -- not true actually! use 'shared' mode for lowest time(local ops)
             fmt.Println("Statistics...")
             fmt.Println("- message count  ", xchg, "msgs")
             fmt.Printf("- avg. throughput ~%.3f MB/s\n", tput)
